@@ -66,7 +66,9 @@ def main():
         y2_crop = 0
 
         # 读取和处理点云
-        workpiece = "thickboard.pcd"
+        # workpiece = "thickboard.pcd"
+        # workpiece = "thickBoardweld.pcd"
+        workpiece = "test_zhongjian.pcd"
         pcd = o3d.io.read_point_cloud('./pointcloud/' + workpiece)
         
 
@@ -139,7 +141,13 @@ def main():
         o3d.visualization.draw_geometries([pcd, transformed_pcd, camera_frame])
         # o3d.visualization.draw_geometries([pcd, camera_frame])
         # o3d.visualization.draw_geometries([pcd, transformed_pcd])
-        o3d.io.write_point_cloud("./pointcloud/transformed_pcd.pcd", transformed_pcd)
+                # 保存变换参数
+        if not os.path.exists("./transforms"):
+            os.makedirs("./transforms")
+        if not os.path.exists("./transforms/" + workpiece):
+            os.makedirs("./transforms/" + workpiece)
+        o3d.io.write_point_cloud("./transforms/" + workpiece + "/transformed_pcd.pcd", transformed_pcd)
+        # o3d.io.write_point_cloud("./pointcloud/transformed_pcd.pcd", transformed_pcd)
         # print("平面1法向量:", normal_1)
         # print("平面2法向量:", normal_2)
         # print(camera_frame)
@@ -155,14 +163,12 @@ def main():
             'z_axis': z_axis
         }
 
-        # 保存变换参数
-        if not os.path.exists("./transforms"):
-            os.makedirs("./transforms")
-            
-        np.save("./transforms/transform_params.npy", transform_params)
+
+        # np.save("./transforms/transform_params.npy", transform_params)
+        np.save("./transforms/" + workpiece + "/transform_params.npy", transform_params)
         
         # 保存为可读文本
-        with open("./transforms/transform_params.txt", 'w') as f:
+        with open("./transforms/" + workpiece + "/transform_params.txt", 'w') as f:
             for key, value in transform_params.items():
                 f.write(f"{key}:\n{value}\n\n")
 
@@ -172,7 +178,7 @@ def main():
         ###########################################################
         # Crop Point Cloud
         # Define a bounding box for cropping
-        new_pcd = o3d.io.read_point_cloud("./pointcloud/transformed_pcd.pcd")
+        new_pcd = o3d.io.read_point_cloud("./transforms/" + workpiece + "/transformed_pcd.pcd")
         y1_crop = -30
         y2_crop = 0 
         bbox = o3d.geometry.AxisAlignedBoundingBox(min_bound=(-15, y1_crop, -50), max_bound=(100, y2_crop, 50))

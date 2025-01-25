@@ -2,3 +2,6 @@
 *.png
 *.7z
 *.ply
+*.pcd
+*.npy
+*txt
